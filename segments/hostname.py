@@ -1,5 +1,7 @@
 def add_hostname_segment():
-    if powerline.args.colorize_hostname:
+    if os.environ.get('SMSCHROOT'):
+        powerline.append(' sms ', Color.SMS_FG, Color.SMS_BG)
+    elif powerline.args.colorize_hostname:
         from lib.color_compliment import stringToHashToColorAndOpposite
         from lib.colortrans import rgb2short
         from socket import gethostname
@@ -19,6 +21,5 @@ def add_hostname_segment():
             host_prompt = ' %s ' % socket.gethostname().split('.')[0]
 
         powerline.append(host_prompt, Color.HOSTNAME_FG, Color.HOSTNAME_BG)
-
 
 add_hostname_segment()

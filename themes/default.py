@@ -8,6 +8,8 @@ class DefaultColor:
 
     HOSTNAME_FG = 250
     HOSTNAME_BG = 238
+    SMS_FG = 39
+    SMS_BG = 238
 
     HOME_SPECIAL_DISPLAY = True
     HOME_BG = 31  # blueish
