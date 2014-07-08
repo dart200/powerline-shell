@@ -51,6 +51,8 @@ def add_git_segment():
         return
 
     branch = output.rstrip()[2:]
+    if branch == 'master':
+        branch = u'\uE0A0 master'
     bg = Color.REPO_CLEAN_BG
     fg = Color.REPO_CLEAN_FG
 
