@@ -9,7 +9,7 @@ def alrmHandler(signum, frame):
     raise Alarm
 
 def get_git_status():
-    has_pending_commits = True
+    has_pending_commits = False
     has_untracked_files = False
     origin_position = ""
     failed = False
@@ -19,27 +19,31 @@ def get_git_status():
     signal.alarm(3)
 
     try:
-        p = subprocess.Popen(['git', 'status', '--ignore-submodules'], stdout=subprocess.PIPE)
+        p = subprocess.Popen(['git', 'status', '--ignore-submodules', '--porcelain', '-b'], stdout=subprocess.PIPE)
         output = p.communicate()[0]
         signal.alarm(0)
     except Alarm:
         p.kill()
         return False, False, "", True
 
-    for line in output.split('\n'):
-        origin_status = re.findall(
-                r"Your branch is (ahead|behind).*?(\d+) comm", line)
-        if origin_status:
-            origin_position = " %d" % int(origin_status[0][1])
-            if origin_status[0][0] == 'behind':
-                origin_position += u'\u21E3'
-            if origin_status[0][0] == 'ahead':
-                origin_position += u'\u21E1'
+    lines = output.split('\n')
 
-        if line.find('nothing to commit') >= 0:
-            has_pending_commits = False
-        if line.find('Untracked files') >= 0:
-            has_untracked_files = True
+    # check for behind/ahead commit
+    for origin_status in re.findall(r"(ahead|behind) (\d+)", lines[0]):
+        origin_position += " %d" %int(origin_status[1])
+        if origin_status[0] == 'behind':
+            origin_position += u'\u21E3'
+        if origin_status[0] == 'ahead':
+            origin_position += u'\u21E1'
+
+    # check for pending changes and/or untracked files
+    if len(lines) > 0:
+        for line in lines[1:-1]:
+            if line[0] == '?':
+                has_untracked_files = True
+            else:
+                has_pending_commits = True
+
     return has_pending_commits, has_untracked_files, origin_position, failed
 
 def add_git_segment():
@@ -51,8 +55,8 @@ def add_git_segment():
         return
 
     branch = output.rstrip()[2:]
-    if branch == 'master':
-        branch = u'\uE0A0 master'
+    branch = u'\uE0A0 '+branch
+
     bg = Color.REPO_CLEAN_BG
     fg = Color.REPO_CLEAN_FG
 
