@@ -21,17 +21,27 @@ def add_cwd_segment():
     if len(names) > max_depth:
         names = names[:2] + [u'\u2026'] + names[2 - max_depth:]
 
-    if not powerline.args.cwd_only:
-        for n in names[:-1]:
-            if n == '~' and Color.HOME_SPECIAL_DISPLAY:
-                powerline.append(' %s ' % n, Color.HOME_FG, Color.HOME_BG)
-            else:
-                powerline.append(' %s ' % n, Color.PATH_FG, Color.PATH_BG,
-                    powerline.separator_thin, Color.SEPARATOR_FG)
+    # special package display for SMS chrooted env
+    if os.environ.get('SMSCHROOT'):
+        if len(names) > 1 and names[0] == 'src':
+            powerline.append(' %s ' % names[1], Color.DPKG_FG, Color.DPKG_BG)
+            names = names[2:]
+        if len(names) > 1 and names[0] == 'bld':
+            powerline.append(' %s ' % names[1], Color.DPKG_BG, Color.DPKG_FG)
+            names = names[2:]
 
-    if names[-1] == '~' and Color.HOME_SPECIAL_DISPLAY:
-        powerline.append(' %s ' % names[-1], Color.HOME_FG, Color.HOME_BG)
-    else:
-        powerline.append(' %s ' % names[-1], Color.CWD_FG, Color.PATH_BG)
+    if len(names):
+        if not powerline.args.cwd_only:
+            for n in names[:-1]:
+                if n == '~' and Color.HOME_SPECIAL_DISPLAY:
+                    powerline.append(' %s ' % n, Color.HOME_FG, Color.HOME_BG)
+                else:
+                    powerline.append(' %s ' % n, Color.PATH_FG, Color.PATH_BG,
+                        powerline.separator_thin, Color.SEPARATOR_FG)
+
+        if names[-1] == '~' and Color.HOME_SPECIAL_DISPLAY:
+            powerline.append(' %s ' % names[-1], Color.HOME_FG, Color.HOME_BG)
+        else:
+            powerline.append(' %s ' % names[-1], Color.CWD_FG, Color.PATH_BG)
 
 add_cwd_segment()

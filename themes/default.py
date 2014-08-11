@@ -17,6 +17,8 @@ class DefaultColor:
     PATH_BG = 237  # dark grey
     PATH_FG = 250  # light grey
     CWD_FG = 254  # nearly-white grey
+    DPKG_FG = 0 # white
+    DPKG_BG = 172  # orange
     SEPARATOR_FG = 244
 
     READONLY_BG = 124
